@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>INFESTATION | System Terminal</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link href="https://fonts.cdnfonts.com/css/american-slasher-personal-use" rel="stylesheet">
+<style>
+    :root {
+        --blood-red: #ff4c4c;
+        --dark-void: #0a0a0a;
+        --panel-bg: #161616;
+        --text-gray: #eaeaea;
+    }
+
+    * { box-sizing: border-box; transition: all 0.3s ease; }
+
+    body {
+        margin: 0;
+        font-family: 'Segoe UI', Arial, sans-serif;
+        background-color: var(--dark-void);
+        color: var(--text-gray);
+        overflow-x: hidden;
+    }
+
+    /* Animations */
+    @keyframes heartbeat {
+        0% { transform: scale(1); text-shadow: 0 0 5px var(--blood-red); }
+        14% { transform: scale(1.05); text-shadow: 0 0 20px var(--blood-red); }
+        28% { transform: scale(1); text-shadow: 0 0 5px var(--blood-red); }
+        42% { transform: scale(1.05); text-shadow: 0 0 20px var(--blood-red); }
+        70% { transform: scale(1); text-shadow: 0 0 5px var(--blood-red); }
+    }
+
+    @keyframes glitch {
+        0% { transform: translate(0); }
+        20% { transform: translate(-2px, 2px); }
+        40% { transform: translate(-2px, -2px); }
+        60% { transform: translate(2px, 2px); }
+        80% { transform: translate(2px, -2px); }
+        100% { transform: translate(0); }
+    }
+
+    @keyframes scrollTagline {
+        0% { transform: translateX(100%); }
+        100% { transform: translateX(-100%); }
+    }
+
+    h1, h2, .bento-title {
+        font-family: 'American Slasher - Personal Use', sans-serif;
+        color: var(--blood-red);
+        text-transform: uppercase;
+        letter-spacing: 2px;
+        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.9);
+    }
+
+    .main-header {
+        text-align: center;
+        padding: 40px 20px 10px 20px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .main-logo {
+        font-size: 7rem;
+        margin: 0;
+        animation: heartbeat 2s ease-in-out infinite;
+    }
+
+    .header-tagline-container {
+        width: 100%;
+        max-width: 800px;
+        overflow: hidden;
+        margin-top: 10px;
+        white-space: nowrap;
+        padding: 8px 0;
+        border-top: 1px solid rgba(255, 76, 76, 0.3);
+        border-bottom: 1px solid rgba(255, 76, 76, 0.3);
+    }
+
+    .header-tagline {
+        display: inline-block;
+        color: var(--blood-red);
+        font-family: monospace;
+        text-transform: uppercase;
+        letter-spacing: 4px;
+        font-size: 0.9rem;
+        animation: scrollTagline 12s linear infinite;
+    }
+
+    .bento-container {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        grid-template-rows: repeat(2, 250px);
+        gap: 20px;
+        max-width: 1200px;
+        margin: 0 auto 50px auto;
+        padding: 20px;
+    }
+
+    .bento-panel {
+        background: var(--panel-bg);
+        border: 1px solid #333;
+        border-radius: 15px;
+        padding: 30px;
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-end;
+        cursor: pointer;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .panel-image {
+        position: absolute;
+        top: 0; left: 0;
+        width: 100%; height: 100%;
+        background-size: cover;
+        background-position: center;
+        opacity: 0.35;
+        z-index: 1;
+        transition: 0.5s ease;
+    }
+
+    .bento-panel:hover .panel-image {
+        opacity: 0.6;
+        animation: glitch 0.2s infinite;
+        filter: hue-rotate(10deg) contrast(1.2);
+    }
+
+    .large { grid-column: span 2; grid-row: span 2; }
+    .wide { grid-column: span 2; }
+
+    .bento-panel:hover {
+        border-color: var(--blood-red);
+        transform: translateY(-5px);
+        box-shadow: 0 0 25px rgba(255, 76, 76, 0.3);
+    }
+
+    .bento-content { position: relative; z-index: 2; }
+    .bento-title { font-size: 2.2rem; margin: 0; }
+    .bento-desc { font-size: 0.9rem; color: #ddd; margin-top: 10px; }
+
+    #content-view {
+        display: none;
+        padding: 60px 15%;
+        min-height: 100vh;
+        animation: fadeIn 0.5s ease;
+    }
+
+    .back-btn {
+        background: none;
+        border: 1px solid var(--blood-red);
+        color: var(--blood-red);
+        padding: 10px 20px;
+        cursor: pointer;
+        margin-bottom: 40px;
+    }
+
+    .back-btn:hover { background: var(--blood-red); color: white; }
+    
+    .content-body { font-size: 1.1rem; line-height: 1.8; }
+    .content-body h3 { color: var(--blood-red); border-bottom: 1px solid #333; padding-bottom: 5px; margin-top: 25px; text-transform: uppercase; }
+    .sector-desc { font-style: italic; color: #888; background: #111; padding: 15px; border-left: 3px solid var(--blood-red); margin-bottom: 25px; }
+
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(20px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    @media (max-width: 900px) {
+        .bento-container { grid-template-columns: 1fr 1fr; grid-template-rows: auto; }
+        .large, .wide { grid-column: span 2; }
+        .main-logo { font-size: 4rem; }
+    }
+</style>
+</head>
+<body>
+
+    <div id="home-view">
+        <header class="main-header">
+            <h1 class="main-logo">INFESTATION</h1>
+            <div class="header-tagline-container">
+                <div class="header-tagline">2026 Quarantine Protocol: Select a Sector</div>
+            </div>
+        </header>
+
+        <div class="bento-container">
+            <div class="bento-panel large" onclick="showContent('overview')">
+                <div class="panel-image" style="background-image: url('https://media.moddb.com/images/games/1/19/18583/1025744_397801250337188_63233991.jpg');"></div>
+                <div class="bento-content">
+                    <div class="bento-title">Game Overview</div>
+                    <div class="bento-desc">4v1 Asymmetrical Survival Horror.</div>
+                </div>
+            </div>
+
+            <div class="bento-panel wide" onclick="showContent('mechanics')">
+                <div class="panel-image" style="background-image: url('https://i.ytimg.com/vi/2ThtYhkl6mc/maxresdefault.jpg');"></div>
+                <div class="bento-content">
+                    <div class="bento-title">Mechanics</div>
+                    <div class="bento-desc">Stealth, traps, and dynamic AI.</div>
+                </div>
+            </div>
+
+            <div class="bento-panel" onclick="showContent('story')">
+                <div class="panel-image" style="background-image: url('https://assets-prd.ignimgs.com/2022/11/03/residentevilreverse-blogroll-1667500715573.jpg');"></div>
+                <div class="bento-content">
+                    <div class="bento-title">The Story</div>
+                    <div class="bento-desc">The 2026 Mutation.</div>
+                </div>
+            </div>
+
+            <div class="bento-panel" onclick="showContent('target')">
+                <div class="panel-image" style="background-image: url('https://kotaku.com/app/uploads/2023/05/68f0fc51e9cc52abaeb77121992c0d3d.jpg');"></div>
+                <div class="bento-content">
+                    <div class="bento-title">Audience</div>
+                    <div class="bento-desc">Horror Enthusiasts.</div>
+                </div>
+            </div>
+
+            <div class="bento-panel wide" onclick="showContent('planning')">
+                <div class="panel-image" style="background-image: url('https://devforum-uploads.s3.dualstack.us-east-2.amazonaws.com/uploads/original/5X/0/0/6/3/006304c7e2aa402c69c3fab88bc5437f6a4988ee.jpeg');"></div>
+                <div class="bento-content">
+                    <div class="bento-title">Development</div>
+                    <div class="bento-desc">Roadmap and Milestones.</div>
+                </div>
+            </div>
+
+            <div class="bento-panel" onclick="showContent('launch')">
+                <div class="panel-image" style="background-image: url('https://assets-prd.ignimgs.com/2023/12/08/alan-wake-2-ign-best-horror-1702043458483.jpg');"></div>
+                <div class="bento-content">
+                    <div class="bento-title">Launch</div>
+                    <div class="bento-desc">Marketing Strategy.</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="content-view">
+        <button class="back-btn" onclick="showHome()">← RETURN TO TERMINAL</button>
+        <h2 id="content-title" style="font-size: 4rem;"></h2>
+        <div id="content-body" class="content-body"></div>
+    </div>
+
+   <script>
+        const data = {
+            overview: { 
+                title: "Game Overview", 
+                body: `
+                    <div class="sector-desc">A sprawling view of an abandoned metropolis, flickering neon signs casting long shadows over cracked pavement. The air is thick with a sense of isolation and a looming threat hidden in the darkness.</div>
+                    <img src='https://media.moddb.com/images/games/1/19/18583/1025744_397801250337188_63233991.jpg' style='width:100%; border-radius:12px; margin-bottom:20px; border: 1px solid #333;'>
+                    <p style="font-style: italic; color: #ff4c4c; font-size: 1.1rem; margin-bottom: 15px;">
+                        "In the year 2026, the 'Miracle' went wrong. What was meant to save humanity has turned a metropolis into a graveyard."
+                    </p>
+                    <p><strong>INFESTATION</strong> is an asymmetrical multiplayer survival horror game. Four survivors navigate an abandoned quarantined city with scarce resources, completing objectives to escape while one player controls the mutated infected, whose goal is to hunt and eliminate survivors using stealth, traps, and special abilities.</p>
+                    
+                    <h3>CORE PROTOCOLS</h3>
+                    <ul>
+                        <li><strong>The 4v1 Dynamic:</strong> A tense struggle between a team of four Survivors and a single, powerful Mutated Infected.</li>
+                        <li><strong>Objective-Based Survival:</strong> Survivors must decipher terminal codes and secure extraction paths while managing limited light and stamina.</li>
+                        <li><strong>System Stealth:</strong> Realistic audio-driven gameplay—every sound, from glass shards to heavy breathing, is a beacon for the hunter.</li>
+                    </ul>
+
+                    <h3>THE SECTORS</h3>
+                    <p>The world includes dark alleys, abandoned labs, and restricted zones, each presenting unique environmental challenges and strategies, such as collapsing floors or security alarms.</p>
+                ` 
+            },
+            mechanics: { 
+                title: "Gameplay Mechanics", 
+                body: `
+                    <div class="sector-desc">A detailed blueprint of a high-tech terminal, glowing with complex data streams. Overlaying it are tactical icons representing stealth routes, trap placements, and resource nodes.</div>
+                    <img src='https://i.ytimg.com/vi/2ThtYhkl6mc/maxresdefault.jpg' style='width:100%; border-radius:12px; margin-bottom:20px; border: 1px solid #333;'>
+                    <p><strong>The Survival Protocol:</strong> A high-stakes game of cat-and-mouse where resource scarcity and environmental awareness determine the victor.</p>
+                    
+                    <h3>SURVIVOR OBJECTIVES</h3>
+                    <ul>
+                        <li><strong>System Access:</strong> Locate and unlock secure terminal doors to progress.</li>
+                        <li><strong>Power Restoration:</strong> Repair failing generators to activate elevators and floodlights.</li>
+                        <li><strong>Resource Retrieval:</strong> Secure Class-A Medkits and bio-suppressants essential for survival.</li>
+                    </ul>
+
+                    <h3>THE INFECTED'S ARSENAL</h3>
+                    <ul>
+                        <li><strong>Apex Mobility:</strong> Utilize "Burst Sprints" and vertical scaling to navigate rooftops.</li>
+                        <li><strong>Ambush Predator:</strong> Cloak presence in shadows for lethal surprise attacks.</li>
+                        <li><strong>Hive Traps:</strong> Deploy biological traps to snare or slow down fleeing Survivors.</li>
+                    </ul>
+                `
+            },
+            story: { 
+                title: "Story & Theme", 
+                body: `
+                    <div class="sector-desc">A gritty montage of newspaper clippings, government documents with "REDACTED" stamps, and grainy CCTV footage showing the initial containment breach.</div>
+                    <img src='https://assets-prd.ignimgs.com/2022/11/03/residentevilreverse-blogroll-1667500715573.jpg' style='width:100%; border-radius:12px; margin-bottom:20px; border: 1px solid #333;'>
+                    <p style="font-style: italic; color: #ff4c4c;">"The Miracle Incident: 2026."</p>
+                    <p>In 2026, a government-funded project codenamed "The Miracle" suffered a catastrophic containment breach in a densely populated urban center. An entire metropolis has been scrubbed from the map, leaving only those trapped inside to uncover the truth.</p>
+                    
+                    <h3>THE CAST OF SURVIVORS</h3>
+                    <ul>
+                        <li><strong>Civilians:</strong> Everyday people forced into extraordinary violence.</li>
+                        <li><strong>Scientists:</strong> Former architects of "The Miracle" seeking a cure—or a cover-up.</li>
+                        <li><strong>Security Personnel:</strong> Abandoned tactical units caught between duty and survival.</li>
+                    </ul>
+                    
+                    <h3>THE MORAL COMPASS</h3>
+                    <p>Players face grueling ethical dilemmas. Will you risk the group’s safety to rescue a trapped survivor, or prioritize your own extraction?</p>
+                `
+            },
+            target: { 
+                title: "Target Audience", 
+                body: `
+                    <div class="sector-desc">A vibrant collage of diverse young gamers reacting to intense gameplay moments, emphasizing the social and emotional impact of the game.</div>
+                    <img src='https://kotaku.com/app/uploads/2023/05/68f0fc51e9cc52abaeb77121992c0d3d.jpg' style='width:100%; border-radius:12px; margin-bottom:20px; border: 1px solid #333;'>
+                    <h3>THE HORROR DEMOGRAPHIC</h3>
+                    <p>INFESTATION captures the "Cooperative Horror" market through high-replayability and atmospheric tension.</p>
+                    <ul>
+                        <li><strong>Core Demographic:</strong> Users aged 15–30 who prioritize social multiplayer experiences.</li>
+                        <li><strong>Collegiate Play:</strong> Designed for the intramural gaming scene where communication is key.</li>
+                        <li><strong>The "Screamer" Market:</strong> Balanced for content creators, featuring high-stakes "clutch" moments.</li>
+                    </ul>
+                `
+            },
+            planning: { 
+                title: "Game Planning", 
+                body: ` 
+                    <div class="sector-desc">Game development team collaborating in a dimly lit studio, surrounded by concept art and monitors displaying early prototypes.</div>
+                    <img src='https://devforum-uploads.s3.dualstack.us-east-2.amazonaws.com/uploads/original/5X/0/0/6/3/006304c7e2aa402c69c3fab88bc5437f6a4988ee.jpeg' style='width:100%; border-radius:12px; margin-bottom:20px; border: 1px solid #333;'>
+                    <p>The team is diverse, with individuals of various backgrounds united by their passion for creating a groundbreaking horror game.</p>
+                    <h3>THE 4.5 MONTH SPRINT</h3>
+                    <ul>
+                        <li><strong>Concept & Design (Weeks 1-2):</strong> Finalizing the core GDD and character classes.</li>
+                        <li><strong>Prototyping (Month 1):</strong> Grey-box testing of the 4v1 loop.</li>
+                        <li><strong>Production (Months 2-3):</strong> Full-scale level design and 3D modeling.</li>
+                        <li><strong>QA & Launch Prep (Month 4):</strong> Stress testing and final balancing.</li>
+                    </ul>
+                `
+            },
+            launch: { 
+                title: "Launch Strategy", 
+                body: `
+                    <div class="sector-desc">Neon-lit urban street at night with a silhouetted figure. Vintage movie theater marquee glows with red and green neon signage reading CINEMA.</div>
+                    <img src='https://assets-prd.ignimgs.com/2023/12/08/alan-wake-2-ign-best-horror-1702043458483.jpg' style='width:100%; border-radius:12px; margin-bottom:20px; border: 1px solid #333;'>
+                    <h3>MARKETING & COMMUNITY</h3>
+                    <ul>
+                        <li><strong>Social Media Blitz:</strong> Daily countdown posts featuring survivor diaries.</li>
+                        <li><strong>Press & Review Copies:</strong> Distribution to gaming journalists two weeks pre-launch.</li>
+                        <li><strong>Post-Launch Support:</strong> Monthly content updates including new maps and cosmetics.</li>
+                    </ul>
+
+                    <h3>REVENUE & MONETIZATION</h3>
+                    <p>Free-to-play model with cosmetic battle pass. No gameplay-altering pay-to-win mechanics—pure survival skill determines victory.</p>
+                `
+            }
+        };
+
+        function showContent(category) {
+            document.getElementById('home-view').style.display = 'none';
+            document.getElementById('content-view').style.display = 'block';
+            document.getElementById('content-title').innerText = data[category].title;
+            document.getElementById('content-body').innerHTML = data[category].body;
+            window.scrollTo(0,0);
+        }
+
+        function showHome() {
+            document.getElementById('home-view').style.display = 'block';
+            document.getElementById('content-view').style.display = 'none';
+        }
+    </script>
+fonts.cdnfonts.com
